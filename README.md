@@ -1,0 +1,1 @@
+soubory k LCD SHARP
