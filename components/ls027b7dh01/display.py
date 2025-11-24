@@ -8,7 +8,7 @@ AUTO_LOAD = ["display"]
 
 DEPENDENCIES = ["spi"]
 
-ls032b7dd02_ns = cg.esphome_ns.namespace("ls027b7dh01")
+ls027b7dh01_ns = cg.esphome_ns.namespace("ls027b7dh01")
 LS027B7DH01 = ls027b7dh01_ns.class_(
     "LS027B7DH01", cg.PollingComponent, display.DisplayBuffer, spi.SPIDevice
 )
@@ -34,4 +34,5 @@ async def to_code(config):
         lambda_ = await cg.process_lambda(
             config[CONF_LAMBDA], [(display.DisplayRef, "it")], return_type=cg.void
         )
+
         cg.add(var.set_writer(lambda_))
