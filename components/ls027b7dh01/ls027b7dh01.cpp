@@ -88,7 +88,7 @@ namespace esphome
       memset(this->buffer_, color.is_on() ? 0x00 : 0xFF, this->get_buffer_length_());
     }
 
-    void LS032B7DD02::dump_config()
+    void LS027B7DH01::dump_config()
     {
       LOG_DISPLAY("", "LS027B7DH01", this);
       ESP_LOGCONFIG(TAG, "  Height: %d", this->height_);
@@ -97,7 +97,7 @@ namespace esphome
       LOG_UPDATE_INTERVAL(this);
     }
 
-    float LS032B7DD02::get_setup_priority() const { return setup_priority::PROCESSOR; }
+    float LS027B7DH01::get_setup_priority() const { return setup_priority::PROCESSOR; }
 
     void LS027B7DH01::update()
     {
@@ -120,9 +120,10 @@ namespace esphome
       }
     }
 
-    size_t LS032B7DD02::get_buffer_length_() {
+    size_t LS027B7DH01::get_buffer_length_() {
       return size_t(this->get_width_internal()) * size_t(this->get_height_internal()) / 8u;
     }
 
   } // namespace LS027B7DH01
+
 } // namespace esphome
