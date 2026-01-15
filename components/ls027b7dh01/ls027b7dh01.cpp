@@ -1,4 +1,4 @@
-#include "LS027B7DH01.h"
+#include "ls027b7dh01.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/components/display/display_buffer.h"
@@ -127,3 +127,4 @@ namespace esphome
   } // namespace LS027B7DH01
 
 } // namespace esphome
+
