@@ -5,10 +5,10 @@
 
 namespace esphome
 {
-  namespace LS027B7DH01
+  namespace ls027b7dh01
   {
 
-    static const char *const TAG = "LS027B7DH01";
+    static const char *const TAG = "ls027b7dh01";
 
     void LS027B7DH01::setup()
     {
@@ -127,4 +127,5 @@ namespace esphome
   } // namespace LS027B7DH01
 
 } // namespace esphome
+
 
