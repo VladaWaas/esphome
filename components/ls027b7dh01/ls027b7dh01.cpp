@@ -124,8 +124,9 @@ namespace esphome
       return size_t(this->get_width_internal()) * size_t(this->get_height_internal()) / 8u;
     }
 
-  } // namespace LS027B7DH01
+  } // namespace ls027b7dh01
 
 } // namespace esphome
+
 
 
