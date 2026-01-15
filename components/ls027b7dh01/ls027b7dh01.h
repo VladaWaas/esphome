@@ -6,7 +6,7 @@
 
 namespace esphome
 {
-  namespace LS027B7DH01
+  namespace ls027b7dh01
   {
 
     class LS027B7DH01;
@@ -46,6 +46,7 @@ namespace esphome
 
     };
 
-  } // namespace LS027B7DH01
+  } // namespace ls027b7dh01
 } // namespace esphome
+
 
