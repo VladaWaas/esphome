@@ -26,7 +26,7 @@ void LS027B7DH01::setup() {
   memset(this->buffer_, 0xFF, BUFFER_SIZE);
   
   // Tell DisplayBuffer where our buffer is
-  this->init_internal(BUFFER_SIZE);
+  this->init_internal_(BUFFER_SIZE);
   
   this->clear_display_();
   
@@ -168,6 +168,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
