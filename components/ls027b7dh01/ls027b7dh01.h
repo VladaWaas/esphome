@@ -36,7 +36,7 @@ class LS027B7DH01 : public display::DisplayBuffer,
   void clear_display_();
   void toggle_vcom_();
   
-  uint8_t *buffer_{nullptr};
+ 
   bool vcom_state_{false};
   
   static const size_t BUFFER_SIZE = (LS027B7DH01_WIDTH / 8) * LS027B7DH01_HEIGHT;
@@ -44,6 +44,7 @@ class LS027B7DH01 : public display::DisplayBuffer,
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
