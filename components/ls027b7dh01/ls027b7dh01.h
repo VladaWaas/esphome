@@ -14,9 +14,9 @@ static const uint8_t SHARP_LCD_BIT_WRITECMD = 0x01;
 static const uint8_t SHARP_LCD_BIT_VCOM = 0x02;
 static const uint8_t SHARP_LCD_BIT_CLEAR = 0x04;
 
-class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_POLARITY_LOW,
-                                          spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_2MHZ>,
-                    public display::DisplayBuffer {
+class LS027B7DH01 : public display::DisplayBuffer,
+                    public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_POLARITY_LOW,
+                                          spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_2MHZ> {
  public:
   void setup() override;
   void dump_config() override;
@@ -42,3 +42,4 @@ class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_P
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
