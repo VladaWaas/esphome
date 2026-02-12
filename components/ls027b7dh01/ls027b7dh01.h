@@ -12,16 +12,15 @@ namespace ls027b7dh01 {
 // Interface: SPI
 // Color: Monochrome (1-bit per pixel)
 
-static const uint8_t LS027B7DH01_WIDTH = 400;
-static const uint8_t LS027B7DH01_HEIGHT = 240;
+static const uint16_t LS027B7DH01_WIDTH = 400;
+static const uint16_t LS027B7DH01_HEIGHT = 240;
 
 // Sharp Memory LCD Commands
 static const uint8_t SHARP_LCD_BIT_WRITECMD = 0x01;  // Write line command
 static const uint8_t SHARP_LCD_BIT_VCOM = 0x02;      // VCOM bit
 static const uint8_t SHARP_LCD_BIT_CLEAR = 0x04;     // Clear screen command
 
-class LS027B7DH01 : public PollingComponent,
-                    public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_POLARITY_LOW,
+class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_POLARITY_LOW,
                                           spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_2MHZ>,
                     public display::DisplayBuffer {
  public:
@@ -52,3 +51,4 @@ class LS027B7DH01 : public PollingComponent,
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
