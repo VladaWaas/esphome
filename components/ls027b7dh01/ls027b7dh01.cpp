@@ -74,6 +74,8 @@ void LS027B7DH01::fill(Color color) {
   // Sharp LCD: 1 = white, 0 = black
   uint8_t fill_byte = color.is_on() ? 0x00 : 0xFF;
   memset(this->buffer_, fill_byte, BUFFER_SIZE);
+  // Ověř že buffer je opravdu naplněn
+  ESP_LOGD(TAG, "After fill, buffer[0] = 0x%02X", this->buffer_[0]);
 }
 
 void LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color) {
@@ -172,6 +174,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
