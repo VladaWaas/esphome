@@ -15,7 +15,7 @@ DEPENDENCIES = ["spi"]
 
 ls027b7dh01_ns = cg.esphome_ns.namespace("ls027b7dh01")
 LS027B7DH01 = ls027b7dh01_ns.class_(
-    "LS027B7DH01", cg.PollingComponent, spi.SPIDevice, display.DisplayBuffer
+    "LS027B7DH01", cg.PollingComponent, spi.SPIDevice, esphome_display.DisplayBuffer
 )
 
 CONFIG_SCHEMA = (
