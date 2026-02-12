@@ -39,16 +39,22 @@ void LS027B7DH01::dump_config() {
 }
 
 void LS027B7DH01::update() {
-  ESP_LOGD(TAG, "Update called");  // ← PŘIDAT
+  ESP_LOGD(TAG, "Update called");
+  
   // Toggle VCOM bit (must be done at least once per second)
   this->toggle_vcom_();
-  ESP_LOGD(TAG, "About to call do_update_");  // ← PŘIDAT
+  
+  ESP_LOGD(TAG, "About to call do_update_");
+  
   // Update display if anything changed
   this->do_update_();
   
+  ESP_LOGD(TAG, "About to write display data");  // ← PŘIDAT TOTO!
+  
   // Write buffer to display
-  this->write_display_data_();  // ← TOTO CHYBĚLO!
-  ESP_LOGD(TAG, "Update complete");  // ← PŘIDAT
+  this->write_display_data_();
+  
+  ESP_LOGD(TAG, "Update complete");
 }
 
 void LS027B7DH01::fill(Color color) {
@@ -167,6 +173,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
