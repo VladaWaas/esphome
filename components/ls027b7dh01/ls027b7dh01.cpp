@@ -11,22 +11,10 @@ static const char *const TAG = "ls027b7dh01";
 void LS027B7DH01::setup() {
   ESP_LOGCONFIG(TAG, "Setting up LS027B7DH01...");
   
-  // Initialize SPI first
   this->spi_setup();
   
-  // Allocate buffer
-  this->buffer_ = new uint8_t[BUFFER_SIZE];
-  if (this->buffer_ == nullptr) {
-    ESP_LOGE(TAG, "Failed to allocate buffer");
-    this->mark_failed();
-    return;
-  }
-  
-  // Clear buffer
-  memset(this->buffer_, 0xFF, BUFFER_SIZE);
-  
-  // Tell DisplayBuffer where our buffer is
-  this->init_internal_(BUFFER_SIZE);
+  // DisplayBuffer už má buffer alokovaný - jen ho vynuluj
+  memset(this->buffer, 0xFF, BUFFER_SIZE);
   
   this->clear_display_();
   
@@ -168,6 +156,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
