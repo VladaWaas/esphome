@@ -105,10 +105,10 @@ void LS027B7DH01::write_display_data_() {
     uint8_t line_addr = line + 1;
     
     // Reverse bits in line address for LSB first transmission
-    // line_addr = ((line_addr & 0x01) << 7) | ((line_addr & 0x02) << 5) | 
-    //            ((line_addr & 0x04) << 3) | ((line_addr & 0x08) << 1) |
-    //            ((line_addr & 0x10) >> 1) | ((line_addr & 0x20) >> 3) | 
-    //            ((line_addr & 0x40) >> 5) | ((line_addr & 0x80) >> 7);
+     line_addr = ((line_addr & 0x01) << 7) | ((line_addr & 0x02) << 5) | 
+                ((line_addr & 0x04) << 3) | ((line_addr & 0x08) << 1) |
+                ((line_addr & 0x10) >> 1) | ((line_addr & 0x20) >> 3) | 
+                ((line_addr & 0x40) >> 5) | ((line_addr & 0x80) >> 7);
     
     this->write_byte(line_addr);
     
@@ -117,10 +117,10 @@ void LS027B7DH01::write_display_data_() {
     for (uint16_t i = 0; i < bytes_per_row; i++) {
       // Reverse bits in each byte for LSB first transmission
       uint8_t data = this->buffer_[offset + i];
-    //  data = ((data & 0x01) << 7) | ((data & 0x02) << 5) | 
-    //         ((data & 0x04) << 3) | ((data & 0x08) << 1) |
-    //         ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | 
-    //         ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
+      data = ((data & 0x01) << 7) | ((data & 0x02) << 5) | 
+             ((data & 0x04) << 3) | ((data & 0x08) << 1) |
+             ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | 
+             ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
       this->write_byte(data);
     }
     
@@ -173,6 +173,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
