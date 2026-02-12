@@ -39,11 +39,13 @@ void LS027B7DH01::dump_config() {
 }
 
 void LS027B7DH01::update() {
+  ESP_LOGD(TAG, "Update called");  // ← PŘIDAT
   // Toggle VCOM bit (must be done at least once per second)
   this->toggle_vcom_();
-  
+  ESP_LOGD(TAG, "About to call do_update_");  // ← PŘIDAT
   // Update display if anything changed
   this->do_update_();
+  ESP_LOGD(TAG, "Update complete");  // ← PŘIDAT
 }
 
 void LS027B7DH01::fill(Color color) {
@@ -162,3 +164,4 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
