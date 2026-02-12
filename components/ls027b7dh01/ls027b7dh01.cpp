@@ -72,11 +72,11 @@ void LS027B7DH01::update() {
 void LS027B7DH01::fill(Color color) {
   ESP_LOGD(TAG, "fill() called! color.is_on=%d", color.is_on());
   
-  // ZAKOMENTUJTE memset - necháme buffer jak je
+  // ZAKOMENTOVÁNO - necháme buffer nedotčený
   // uint8_t fill_byte = color.is_on() ? 0x00 : 0xFF;
   // memset(this->buffer_, fill_byte, BUFFER_SIZE);
   
-  ESP_LOGD(TAG, "fill() - doing NOTHING (commented out)");
+  ESP_LOGD(TAG, "fill() disabled - buffer unchanged");
 }
 
 void LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color) {
@@ -175,6 +175,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
