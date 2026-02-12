@@ -27,6 +27,18 @@ void LS027B7DH01::setup() {
   memset(this->buffer_, 0xFF, BUFFER_SIZE);  // 0xFF = all white (Sharp LCD uses 1=white, 0=black)
   this->clear_display_();
   
+  // === PŘIDAT TOTO ===
+  ESP_LOGD(TAG, "Testing clear command...");
+  for (int i = 0; i < 5; i++) {
+    this->enable();
+    this->write_byte(SHARP_LCD_BIT_CLEAR);
+    this->write_byte(0x00);
+    this->disable();
+    delay(100);
+  }
+  ESP_LOGD(TAG, "Clear test done");
+  // === KONEC TESTU ===
+  
   ESP_LOGCONFIG(TAG, "LS027B7DH01 setup complete");
 }
 
@@ -173,6 +185,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
