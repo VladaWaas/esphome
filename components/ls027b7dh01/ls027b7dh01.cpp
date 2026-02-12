@@ -1,132 +1,123 @@
 #include "ls027b7dh01.h"
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
-#include "esphome/components/display/display_buffer.h"
+#include "esphome/core/helpers.h"
 
-namespace esphome
-{
-  namespace ls027b7dh01
-  {
+namespace esphome {
+namespace ls027b7dh01 {
 
-    static const char *const TAG = "ls027b7dh01";
+static const char *const TAG = "ls027b7dh01";
 
-    void LS027B7DH01::setup()
-    {
-      ESP_LOGCONFIG(TAG, "Setting up LS027B7DH01...");
+void LS027B7DH01::setup() {
+  ESP_LOGCONFIG(TAG, "Setting up LS027B7DH01...");
+  
+  // Allocate buffer for framebuffer
+  // Buffer size = (width / 8) * height = (400 / 8) * 240 = 50 * 240 = 12000 bytes
+  this->buffer_ = new uint8_t[BUFFER_SIZE];
+  if (this->buffer_ == nullptr) {
+    ESP_LOGE(TAG, "Failed to allocate buffer");
+    this->mark_failed();
+    return;
+  }
+  
+  // Initialize SPI
+  this->spi_setup();
+  
+  // Clear buffer and display
+  memset(this->buffer_, 0xFF, BUFFER_SIZE);  // 0xFF = all white (Sharp LCD uses 1=white, 0=black)
+  this->clear_display_();
+  
+  ESP_LOGCONFIG(TAG, "LS027B7DH01 setup complete");
+}
 
-      /* Initialize display buffer */
-      this->init_internal_(this->get_buffer_length_());
+void LS027B7DH01::dump_config() {
+  ESP_LOGCONFIG(TAG, "LS027B7DH01:");
+  ESP_LOGCONFIG(TAG, "  Width: %d", LS027B7DH01_WIDTH);
+  ESP_LOGCONFIG(TAG, "  Height: %d", LS027B7DH01_HEIGHT);
+  LOG_PIN("  CS Pin: ", this->cs_);
+  LOG_UPDATE_INTERVAL(this);
+}
 
-      this->dump_config();
+void LS027B7DH01::update() {
+  // Toggle VCOM bit (must be done at least once per second)
+  this->toggle_vcom_();
+  
+  // Update display if anything changed
+  this->do_update_();
+}
 
-      /* Initialize pins */
-      this->spi_setup();
-      this->cs_->setup();
-      this->cs_->digital_write(false);
-      lcd_clear();
-      this->set_interval(1000, [this]() { this->lcd_toggle_vcom(); });
-    }
+void LS027B7DH01::fill(Color color) {
+  // Fill entire buffer with color
+  // Sharp LCD: 1 = white, 0 = black
+  uint8_t fill_byte = color.is_on() ? 0x00 : 0xFF;
+  memset(this->buffer_, fill_byte, BUFFER_SIZE);
+}
 
-    /** Clear display memory */
-    void LS027B7DH01::lcd_clear(void) {
-      this->cs_->digital_write(true);
-      this->write_array((uint8_t *)"\x20\x00", 2);
-      this->cs_->digital_write(false);
-    }
+void LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color) {
+  // Boundary check
+  if (x < 0 || x >= LS027B7DH01_WIDTH || y < 0 || y >= LS027B7DH01_HEIGHT)
+    return;
+  
+  // Calculate buffer position
+  // Each row is 50 bytes (400 pixels / 8 bits per byte)
+  const uint16_t bytes_per_row = LS027B7DH01_WIDTH / 8;
+  const uint16_t byte_offset = y * bytes_per_row + (x / 8);
+  const uint8_t bit_offset = 7 - (x % 8);  // MSB first within each byte
+  
+  // Set or clear the bit
+  // Sharp LCD: 1 = white, 0 = black
+  if (color.is_on()) {
+    // Black pixel
+    this->buffer_[byte_offset] &= ~(1 << bit_offset);
+  } else {
+    // White pixel  
+    this->buffer_[byte_offset] |= (1 << bit_offset);
+  }
+}
 
-    /** Toggle VCOM bit */
-    void LS027B7DH01::lcd_toggle_vcom(void) {
-	  vcom ^= 0x40;
-	  this->cs_->digital_write(true);
-	  this->write_byte(vcom);
-	  this->write_byte('\0');
-	  this->cs_->digital_write(false);
+void LS027B7DH01::write_display_data_() {
+  // Write all lines to the display
+  const uint16_t bytes_per_row = LS027B7DH01_WIDTH / 8;
+  
+  this->enable();
+  
+  // Send write command
+  uint8_t command = SHARP_LCD_BIT_WRITECMD;
+  if (this->vcom_state_) {
+    command |= SHARP_LCD_BIT_VCOM;
+  }
+  this->write_byte(command);
+  
+  // Send each line
+  for (uint16_t line = 0; line < LS027B7DH01_HEIGHT; line++) {
+    // Line address (1-indexed)
+    uint8_t line_addr = line + 1;
+    
+    // Reverse bits in line address for LSB first transmission
+    line_addr = ((line_addr & 0x01) << 7) | ((line_addr & 0x02) << 5) | 
+                ((line_addr & 0x04) << 3) | ((line_addr & 0x08) << 1) |
+                ((line_addr & 0x10) >> 1) | ((line_addr & 0x20) >> 3) | 
+                ((line_addr & 0x40) >> 5) | ((line_addr & 0x80) >> 7);
+    
+    this->write_byte(line_addr);
+    
+    // Send line data
+    uint16_t offset = line * bytes_per_row;
+    for (uint16_t i = 0; i < bytes_per_row; i++) {
+      // Reverse bits in each byte for LSB first transmission
+      uint8_t data = this->buffer_[offset + i];
+      data = ((data & 0x01) << 7) | ((data & 0x02) << 5) | 
+             ((data & 0x04) << 3) | ((data & 0x08) << 1) |
+             ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | 
+             ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
+      this->write_byte(data);
     }
     
-    /** Reverse bit order for line number */
-    uint16_t LS027B7DH01::reverse_line_number(uint16_t value) {
-      uint16_t ret = 0;
-      for(int i = 0; i < 10; i++) {
-        ret <<= 1;
-        ret |= value & 0x0001;
-        value >>= 1;
-      }
-      return ret;
-    }
-
-    /** Flush display buffer */
-    void HOT LS027B7DH01::write_display_data()
-    {
-      uint8_t *ptr = this->buffer_;
-      uint32_t line = 1;
-
-      this->cs_->digital_write(true);
-
-      /* Write line */
-      uint16_t cmd = 0x8000;
-
-      do {
-        uint16_t tmp = reverse_line_number(line);
-        tmp |= cmd;
-        /* Send line number */
-        uint8_t tmp_byte = tmp >> 8;
-        this->write_array(&tmp_byte, 1);
-        tmp_byte = tmp & 0xFF;
-        this->write_array(&tmp_byte, 1);
-        /* Send line data */
-        this->write_array(ptr, this->width_ >> 3);
-        ptr += this->width_ >> 3;
-      } while (line++ < this->height_);
-
-      /* Last 16-bit trailer */
-      this->write_array((uint8_t *)"\x00\x00", 2);
-
-      this->cs_->digital_write(false);
-    }
-
-    void LS027B7DH01::fill(Color color) {
-      memset(this->buffer_, color.is_on() ? 0x00 : 0xFF, this->get_buffer_length_());
-    }
-
-    void LS027B7DH01::dump_config()
-    {
-      LOG_DISPLAY("", "LS027B7DH01", this);
-      ESP_LOGCONFIG(TAG, "  Height: %d", this->height_);
-      ESP_LOGCONFIG(TAG, "  Width: %d", this->width_);
-      LOG_PIN("  CS Pin: ", this->cs_);
-      LOG_UPDATE_INTERVAL(this);
-    }
-
-    float LS027B7DH01::get_setup_priority() const { return setup_priority::PROCESSOR; }
-
-    void LS027B7DH01::update()
-    {
-      this->do_update_();
-      this->write_display_data();
-    }
-
-    void HOT LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color)
-    {
-      /* Calculate byte offset */
-      uint32_t offset = ((y * this->width_) + x) >> 3;
-      // Calculate bit offset
-      uint8_t bpos = x & 0x07;
+    // Send dummy byte (trailer)
+    this->write_byte(0x00);
+  }
   
-      /* Update pixel in the buffer */
-      if (color.is_on()) {
-        this->buffer_[offset] &=~(0x80 >> bpos);
-      } else {
-        this->buffer_[offset] |= (0x80 >> bpos);
-      }
-    }
-
-    size_t LS027B7DH01::get_buffer_length_() {
-      return size_t(this->get_width_internal()) * size_t(this->get_height_internal()) / 8u;
-    }
-
-  } // namespace ls027b7dh01
-
-} // namespace esphome
-
-
-
+  // Send final trailer
+  this->write_byte(0x00);
+  
+  th
