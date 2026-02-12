@@ -80,23 +80,24 @@ void LS027B7DH01::fill(Color color) {
 }
 
 void LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color) {
+  // První pixel - zaloguj
+  static bool first_log = true;
+  if (first_log) {
+    ESP_LOGD(TAG, "draw_pixel called! x=%d, y=%d, color.is_on=%d", x, y, color.is_on());
+    first_log = false;
+  }
+  
   // Boundary check
   if (x < 0 || x >= LS027B7DH01_WIDTH || y < 0 || y >= LS027B7DH01_HEIGHT)
     return;
   
-  // Calculate buffer position
-  // Each row is 50 bytes (400 pixels / 8 bits per byte)
   const uint16_t bytes_per_row = LS027B7DH01_WIDTH / 8;
   const uint16_t byte_offset = y * bytes_per_row + (x / 8);
-  const uint8_t bit_offset = 7 - (x % 8);  // MSB first within each byte
+  const uint8_t bit_offset = 7 - (x % 8);
   
-  // Set or clear the bit
-  // Sharp LCD: 1 = white, 0 = black
   if (color.is_on()) {
-    // Black pixel
     this->buffer_[byte_offset] &= ~(1 << bit_offset);
   } else {
-    // White pixel  
     this->buffer_[byte_offset] |= (1 << bit_offset);
   }
 }
@@ -175,6 +176,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
