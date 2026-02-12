@@ -120,4 +120,45 @@ void LS027B7DH01::write_display_data_() {
   // Send final trailer
   this->write_byte(0x00);
   
-  th
+  this->disable();
+}
+
+void LS027B7DH01::clear_display_() {
+  // Clear display using clear command
+  this->enable();
+  
+  uint8_t command = SHARP_LCD_BIT_CLEAR;
+  if (this->vcom_state_) {
+    command |= SHARP_LCD_BIT_VCOM;
+  }
+  this->write_byte(command);
+  
+  // Send trailer
+  this->write_byte(0x00);
+  
+  this->disable();
+  
+  // Also clear the buffer
+  memset(this->buffer_, 0xFF, BUFFER_SIZE);
+}
+
+void LS027B7DH01::toggle_vcom_() {
+  // Toggle VCOM bit (required at least once per second to prevent DC buildup)
+  this->vcom_state_ = !this->vcom_state_;
+  
+  this->enable();
+  
+  uint8_t command = 0x00;
+  if (this->vcom_state_) {
+    command |= SHARP_LCD_BIT_VCOM;
+  }
+  this->write_byte(command);
+  
+  // Send trailer
+  this->write_byte(0x00);
+  
+  this->disable();
+}
+
+}  // namespace ls027b7dh01
+}  // namespace esphome
