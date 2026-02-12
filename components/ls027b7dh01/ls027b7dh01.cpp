@@ -99,51 +99,38 @@ void LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color) {
 }
 
 void LS027B7DH01::write_display_data_() {
-  // Write all lines to the display
   const uint16_t bytes_per_row = LS027B7DH01_WIDTH / 8;
   
-  this->enable();
+  ESP_LOGD(TAG, "write_display_data START");
+  ESP_LOGD(TAG, "Bytes per row: %d, total lines: %d", bytes_per_row, LS027B7DH01_HEIGHT);
   
-  // Send write command
+  this->enable();
+  ESP_LOGD(TAG, "CS enabled");
+  
   uint8_t command = SHARP_LCD_BIT_WRITECMD;
   if (this->vcom_state_) {
     command |= SHARP_LCD_BIT_VCOM;
   }
+  ESP_LOGD(TAG, "Sending command: 0x%02X", command);
   this->write_byte(command);
   
-  // Send each line
-  for (uint16_t line = 0; line < LS027B7DH01_HEIGHT; line++) {
-    // Line address (1-indexed)
-    uint8_t line_addr = line + 1;
-    
-    // Reverse bits in line address for LSB first transmission
-     line_addr = ((line_addr & 0x01) << 7) | ((line_addr & 0x02) << 5) | 
-                ((line_addr & 0x04) << 3) | ((line_addr & 0x08) << 1) |
-                ((line_addr & 0x10) >> 1) | ((line_addr & 0x20) >> 3) | 
-                ((line_addr & 0x40) >> 5) | ((line_addr & 0x80) >> 7);
-    
-    this->write_byte(line_addr);
-    
-    // Send line data
-    uint16_t offset = line * bytes_per_row;
-    for (uint16_t i = 0; i < bytes_per_row; i++) {
-      // Reverse bits in each byte for LSB first transmission
-      uint8_t data = this->buffer_[offset + i];
-      data = ((data & 0x01) << 7) | ((data & 0x02) << 5) | 
-             ((data & 0x04) << 3) | ((data & 0x08) << 1) |
-             ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | 
-             ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
-      this->write_byte(data);
-    }
-    
-    // Send dummy byte (trailer)
-    this->write_byte(0x00);
-  }
+  ESP_LOGD(TAG, "Sending first line (line 0, addr 1)");
+  uint8_t line_addr = 1;
+  this->write_byte(line_addr);
   
-  // Send final trailer
+  // Pošli jen první řádek pro test
+  for (uint16_t i = 0; i < bytes_per_row; i++) {
+    this->write_byte(this->buffer_[i]);
+  }
   this->write_byte(0x00);
   
+  ESP_LOGD(TAG, "First 5 bytes: %02X %02X %02X %02X %02X", 
+    this->buffer_[0], this->buffer_[1], this->buffer_[2], 
+    this->buffer_[3], this->buffer_[4]);
+  
+  this->write_byte(0x00);
   this->disable();
+  ESP_LOGD(TAG, "write_display_data END");
 }
 
 void LS027B7DH01::clear_display_() {
@@ -185,6 +172,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
