@@ -34,6 +34,13 @@ class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_P
   display::DisplayType get_display_type() override { return display::DisplayType::DISPLAY_TYPE_BINARY; }
 
  protected:
+  void init_internal_(uint32_t buffer_length) override {
+    // Inicializace - buffer už máme alokovaný v setup()
+  }
+  
+  int get_buffer_length_() override { 
+    return BUFFER_SIZE; 
+  }
   void draw_absolute_pixel_internal(int x, int y, Color color) override;
   int get_height_internal() override { return LS027B7DH01_HEIGHT; }
   int get_width_internal() override { return LS027B7DH01_WIDTH; }
@@ -51,6 +58,7 @@ class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_P
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
