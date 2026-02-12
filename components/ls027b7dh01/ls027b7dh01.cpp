@@ -46,6 +46,8 @@ void LS027B7DH01::update() {
   // Update display if anything changed
   this->do_update_();
   ESP_LOGD(TAG, "Update complete");  // ← PŘIDAT
+  // Write buffer to display
+  this->write_display_data_();  // ← TOTO CHYBĚLO!
 }
 
 void LS027B7DH01::fill(Color color) {
@@ -164,4 +166,5 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
