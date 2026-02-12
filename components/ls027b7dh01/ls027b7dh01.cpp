@@ -11,8 +11,10 @@ static const char *const TAG = "ls027b7dh01";
 void LS027B7DH01::setup() {
   ESP_LOGCONFIG(TAG, "Setting up LS027B7DH01...");
   
-  // Allocate buffer for framebuffer
-  // Buffer size = (width / 8) * height = (400 / 8) * 240 = 50 * 240 = 12000 bytes
+  // Initialize SPI first
+  this->spi_setup();
+  
+  // Allocate buffer
   this->buffer_ = new uint8_t[BUFFER_SIZE];
   if (this->buffer_ == nullptr) {
     ESP_LOGE(TAG, "Failed to allocate buffer");
@@ -20,27 +22,17 @@ void LS027B7DH01::setup() {
     return;
   }
   
-  // Initialize SPI
-  this->spi_setup();
+  // Clear buffer
+  memset(this->buffer_, 0xFF, BUFFER_SIZE);
   
-  // Clear buffer and display
-  memset(this->buffer_, 0xFF, BUFFER_SIZE);  // 0xFF = all white (Sharp LCD uses 1=white, 0=black)
+  // Tell DisplayBuffer where our buffer is
+  this->init_internal(BUFFER_SIZE);
+  
   this->clear_display_();
-  
-  // === PŘIDAT TOTO ===
-  ESP_LOGD(TAG, "Testing clear command...");
-  for (int i = 0; i < 5; i++) {
-    this->enable();
-    this->write_byte(SHARP_LCD_BIT_CLEAR);
-    this->write_byte(0x00);
-    this->disable();
-    delay(100);
-  }
-  ESP_LOGD(TAG, "Clear test done");
-  // === KONEC TESTU ===
   
   ESP_LOGCONFIG(TAG, "LS027B7DH01 setup complete");
 }
+
 
 void LS027B7DH01::dump_config() {
   ESP_LOGCONFIG(TAG, "LS027B7DH01:");
@@ -176,6 +168,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
