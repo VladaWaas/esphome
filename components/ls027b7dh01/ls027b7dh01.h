@@ -21,7 +21,7 @@ static const uint8_t SHARP_LCD_BIT_VCOM = 0x02;      // VCOM bit
 static const uint8_t SHARP_LCD_BIT_CLEAR = 0x04;     // Clear screen command
 
 class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_POLARITY_LOW,
-                                          spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_2MHZ>,
+                                          spi::CLOCK_PHASE_TRAILING, spi::DATA_RATE_2MHZ>,
                     public display::DisplayBuffer {
  public:
   void setup() override;
@@ -51,4 +51,5 @@ class LS027B7DH01 : public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_P
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
