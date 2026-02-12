@@ -29,7 +29,9 @@ class LS027B7DH01 : public display::DisplayBuffer,
   void draw_absolute_pixel_internal(int x, int y, Color color) override;
   int get_height_internal() override { return LS027B7DH01_HEIGHT; }
   int get_width_internal() override { return LS027B7DH01_WIDTH; }
-  
+  void init_internal_(uint32_t buffer_length) override {
+    this->init_buffer_(this->buffer_);
+  }
   void write_display_data_();
   void clear_display_();
   void toggle_vcom_();
@@ -42,6 +44,7 @@ class LS027B7DH01 : public display::DisplayBuffer,
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
