@@ -1,52 +1,54 @@
 #pragma once
 
 #include "esphome/core/component.h"
-#include "esphome/components/display/display_buffer.h"
 #include "esphome/components/spi/spi.h"
+#include "esphome/components/display/display_buffer.h"
 
-namespace esphome
-{
-  namespace ls027b7dh01
-  {
+namespace esphome {
+namespace ls027b7dh01 {
 
-    class LS027B7DH01;
+// Sharp Memory LCD LS027B7DH01 display driver
+// Resolution: 400x240 pixels
+// Interface: SPI
+// Color: Monochrome (1-bit per pixel)
 
-    using LS027B7DH01_writer_t = std::function<void(LS027B7DH01 &)>;
+static const uint8_t LS027B7DH01_WIDTH = 400;
+static const uint8_t LS027B7DH01_HEIGHT = 240;
 
-    class LS027B7DH01 : public display::DisplayBuffer,
-                        public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_LOW,
-                                              spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_4MHZ>
-    {
-    public:
-      void set_height(uint16_t height) { this->height_ = height; }
-      void set_width(uint16_t width) { this->width_ = width; }
+// Sharp Memory LCD Commands
+static const uint8_t SHARP_LCD_BIT_WRITECMD = 0x01;  // Write line command
+static const uint8_t SHARP_LCD_BIT_VCOM = 0x02;      // VCOM bit
+static const uint8_t SHARP_LCD_BIT_CLEAR = 0x04;     // Clear screen command
 
-      void setup() override;
-      void dump_config() override;
-      float get_setup_priority() const override;
-      void update() override;
-      void fill(Color color) override;
-      void write_display_data();
-      display::DisplayType get_display_type() override { return display::DisplayType::DISPLAY_TYPE_BINARY; }
-     
-    private:
-      void lcd_clear(void);
-      void lcd_toggle_vcom(void);
-      static uint16_t reverse_line_number(uint16_t value);
+class LS027B7DH01 : public PollingComponent,
+                    public spi::SPIDevice<spi::BIT_ORDER_LSB_FIRST, spi::CLOCK_POLARITY_LOW,
+                                          spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_2MHZ>,
+                    public display::DisplayBuffer {
+ public:
+  void setup() override;
+  void dump_config() override;
+  void update() override;
 
-      uint8_t vcom = 0x00;
+  // Display buffer interface
+  void fill(Color color) override;
+  
+  display::DisplayType get_display_type() override { return display::DisplayType::DISPLAY_TYPE_BINARY; }
 
-    protected:
-      int get_height_internal() override { return this->height_; }
-      int get_width_internal() override { return this->width_; }
-      size_t get_buffer_length_();
-      void draw_absolute_pixel_internal(int x, int y, Color color) override;
+ protected:
+  void draw_absolute_pixel_internal(int x, int y, Color color) override;
+  int get_height_internal() override { return LS027B7DH01_HEIGHT; }
+  int get_width_internal() override { return LS027B7DH01_WIDTH; }
+  
+  void write_display_data_();
+  void clear_display_();
+  void toggle_vcom_();
+  
+  uint8_t *buffer_{nullptr};
+  bool vcom_state_{false};
+  
+  // Buffer size in bytes: (width / 8) * height
+  static const size_t BUFFER_SIZE = (LS027B7DH01_WIDTH / 8) * LS027B7DH01_HEIGHT;
+};
 
-      int16_t width_ = 400, height_ = 240;
-
-    };
-
-  } // namespace ls027b7dh01
-} // namespace esphome
-
-
+}  // namespace ls027b7dh01
+}  // namespace esphome
