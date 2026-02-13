@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import display, spi
-from esphome.const import CONF_ID, CONF_LAMBDA, CONF_PAGES
+from esphome.const import CONF_ID, CONF_LAMBDA
 
 DEPENDENCIES = ["spi"]
 AUTO_LOAD = ["display"]
@@ -24,10 +24,8 @@ CONFIG_SCHEMA = (
     .extend(spi.spi_device_schema(cs_pin_required=True))
 )
 
-
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await spi.register_spi_device(var, config)
     await display.register_display(var, config)
-)
