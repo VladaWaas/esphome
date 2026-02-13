@@ -41,6 +41,9 @@ void LS027B7DH01::update() {
   // Toggle VCOM (nutné každou sekundu)
   this->toggle_vcom_();
   
+   // VYČISTIT displej VŽDY před update!
+  this->clear_display_();  // ← PŘIDAT!
+  
   // Zavolá lambda a vykreslí do bufferu
   this->do_update_();
   
@@ -147,6 +150,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
