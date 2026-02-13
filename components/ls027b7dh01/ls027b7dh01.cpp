@@ -91,7 +91,7 @@ void LS027B7DH01::write_display_data_() {
     uint8_t line_addr = line + 1;
     
     // LSB first - reverse bits
-    // line_addr = this->reverse_bits_(line_addr);
+    line_addr = this->reverse_bits_(line_addr);
     this->write_byte(line_addr);
     
     // Data řádku
@@ -100,7 +100,7 @@ void LS027B7DH01::write_display_data_() {
       uint8_t data = this->buffer_[offset + i];
       
       // LSB first - reverse bits
-      // data = this->reverse_bits_(data);
+      data = this->reverse_bits_(data);
       this->write_byte(data);
     }
     
@@ -147,5 +147,6 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
