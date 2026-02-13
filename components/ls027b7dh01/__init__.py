@@ -5,6 +5,7 @@ from esphome import pins
 from esphome.const import CONF_ID, CONF_LAMBDA, CONF_UPDATE_INTERVAL
 
 DEPENDENCIES = ["spi"]
+AUTO_LOAD = ["display"]
 
 ls027b7dh01_ns = cg.esphome_ns.namespace("ls027b7dh01")
 LS027B7DH01 = ls027b7dh01_ns.class_(
