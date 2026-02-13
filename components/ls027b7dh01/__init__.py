@@ -4,6 +4,8 @@ from esphome.components import spi
 from esphome import pins
 from esphome.const import CONF_ID, CONF_LAMBDA, CONF_UPDATE_INTERVAL
 
+# Na začátek souboru za namespace definici:
+CONF_LS027B7DH01_ID = "ls027b7dh01_id"
 DEPENDENCIES = ["spi"]
 AUTO_LOAD = ["display"]
 
