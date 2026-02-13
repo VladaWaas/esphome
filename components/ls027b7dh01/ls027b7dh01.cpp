@@ -45,10 +45,10 @@ void LS027B7DH01::update() {
   this->clear_display_();  // ← PŘIDAT!
   
   // Zavolá lambda a vykreslí do bufferu
-  this->do_update_();
+  // this->do_update_();
   
   // Odešle buffer na displej
-  this->write_display_data_();
+  // this->write_display_data_();
 }
 
 void LS027B7DH01::draw_absolute_pixel_internal(int x, int y, Color color) {
@@ -150,6 +150,7 @@ void LS027B7DH01::toggle_vcom_() {
 
 }  // namespace ls027b7dh01
 }  // namespace esphome
+
 
 
 
